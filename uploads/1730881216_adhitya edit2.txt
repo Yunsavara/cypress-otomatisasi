@@ -1,0 +1,308 @@
+Tentu! Berikut adalah kode lengkap untuk **halaman login**, **backend untuk verifikasi login**, dan **pengaturan database** yang menghubungkan semuanya. Saya akan mulai dengan penjelasan tentang tabel database, lalu menunjukkan frontend dan backend untuk proses login.
+
+### 1. **Tabel Database untuk Pengguna**
+
+Sebelumnya, kita sudah memiliki tabel `users` yang digunakan untuk menyimpan data login. Berikut adalah struktur tabelnya:
+
+```sql
+CREATE TABLE users (
+    id_user INT AUTO_INCREMENT PRIMARY KEY,
+    nama_user VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+```
+
+**Contoh Data Pengguna di Tabel `users`:**
+
+```sql
+INSERT INTO users (nama_user, password) VALUES ('admin', 'admin123');
+```
+
+### 2. **Backend PHP untuk Verifikasi Login**
+
+Kita akan menggunakan **PHP** untuk menangani login dan memverifikasi kredensial pengguna terhadap database.
+
+#### 2.1. **File PHP untuk Verifikasi Login (`login.php`)**
+
+```php
+<?php
+// login.php
+
+// Mulai sesi untuk menyimpan data login
+session_start();
+
+// Koneksi ke database
+$host = "localhost";  // Ganti dengan host database Anda
+$dbname = "library";  // Ganti dengan nama database Anda
+$username = "root";   // Ganti dengan username database Anda
+$password = "";       // Ganti dengan password database Anda
+
+// Membuat koneksi ke database
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Cek koneksi
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Ambil data dari form login
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Query untuk mencari pengguna berdasarkan username
+    $sql = "SELECT * FROM users WHERE nama_user = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    // Cek apakah pengguna ditemukan
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verifikasi password
+        if ($user['password'] === $password) {
+            // Set session untuk login berhasil
+            $_SESSION['logged_in'] = true;
+            $_SESSION['username'] = $username;
+            echo "Login berhasil";
+        } else {
+            echo "Password salah";
+        }
+    } else {
+        echo "Pengguna tidak ditemukan";
+    }
+
+    $stmt->close();
+}
+
+$conn->close();
+?>
+```
+
+### 3. **Frontend untuk Halaman Login**
+
+Form login akan mengirimkan data (username dan password) ke backend PHP menggunakan **AJAX** (JavaScript), tanpa me-refresh halaman.
+
+#### 3.1. **Halaman Login (login.html)**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Admin Panel</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p id="error-message" style="color: red; display: none;">Invalid username or password.</p>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
+```
+
+#### 3.2. **CSS untuk Halaman Login (login.css)**
+
+```css
+/* General Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#error-message {
+    margin-top: 10px;
+    font-size: 14px;
+    color: red;
+}
+```
+
+#### 3.3. **JavaScript untuk Halaman Login (login.js)**
+
+```javascript
+// Mengambil form login dan menambahkan event listener submit
+document.getElementById('login-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Menghentikan form dari reload halaman
+    
+    // Mengambil data dari form
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    // Membuat FormData untuk dikirim ke server
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    
+    // Membuat request AJAX
+    fetch('login.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        if (data === "Login berhasil") {
+            // Jika login berhasil, arahkan ke halaman admin
+            window.location.href = 'index.html';  // Redirect ke halaman admin dashboard
+        } else {
+            // Jika login gagal, tampilkan pesan error
+            document.getElementById('error-message').style.display = 'block';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+```
+
+### 4. **Menyiapkan Database MySQL**
+
+Pastikan Anda sudah memiliki database dan tabel `users` di MySQL. Berikut adalah SQL untuk membuat database dan tabel pengguna:
+
+```sql
+-- Buat database
+CREATE DATABASE library;
+
+-- Pilih database
+USE library;
+
+-- Buat tabel users
+CREATE TABLE users (
+    id_user INT AUTO_INCREMENT PRIMARY KEY,
+    nama_user VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL
+);
+
+-- Menambahkan pengguna admin
+INSERT INTO users (nama_user, password) VALUES ('admin', 'admin123');
+```
+
+### 5. **Menyiapkan Server PHP**
+
+Untuk menjalankan PHP di server lokal, Anda dapat menggunakan **XAMPP** atau **MAMP**.
+
+- **Instalasi XAMPP (untuk Windows):** [XAMPP Download](https://www.apachefriends.org/index.html)
+  - Setelah menginstal XAMPP, buka **XAMPP Control Panel**, mulai **Apache** dan **MySQL**.
+  - Letakkan file `login.php`, `login.html`, `login.js`, dan `login.css` di folder `htdocs` (misalnya `C:\xampp\htdocs\project_login\`).
+
+### 6. **Testing Login**
+
+1. Pastikan PHP dan MySQL berjalan di server lokal Anda (gunakan XAMPP atau MAMP).
+2. Buka browser dan akses `http://localhost/project_login/login.html`.
+3. Coba login dengan menggunakan username `admin` dan password `admin123`.
+4. Jika login berhasil, Anda akan diarahkan ke halaman `index.html` (Dashboard Admin).
+
+### 7. **Halaman Admin Dashboard (index.html)**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Admin Dashboard</h1>
+        <a href="login.html" id="logout">Logout</a>
+    </header>
+
+    <div id="content">
+        <h2>Dashboard</h2>
+        <p>Welcome, admin!</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Your Company</p>
+    </footer>
+
+    <script src
+
+="scripts.js"></script>
+</body>
+</html>
+```
+
+---
+
+**Penjelasan:**
+- **Backend (PHP)**: File `login.php` menangani verifikasi username dan password dengan mencari data di database MySQL.
+- **Frontend (HTML/CSS/JS)**: Form login di `login.html` mengirimkan data melalui AJAX ke `login.php` untuk memverifikasi kredensial pengguna.
+- **Database (MySQL)**: Tabel `users` menyimpan data pengguna dan password mereka.
+
+Jika Anda membutuhkan penjelasan lebih lanjut atau bantuan lain, beri tahu saya!

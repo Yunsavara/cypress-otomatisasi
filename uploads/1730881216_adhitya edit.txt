@@ -1,0 +1,93 @@
+Tentu! Berikut adalah seluruh query SQL yang Anda minta, ditulis ulang sesuai dengan instruksi terbaru Anda:
+
+### 1. **Tabel `anggota`:**
+
+```sql
+CREATE TABLE anggota (
+    id_anggota INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    alamat VARCHAR(255),
+    no_hp VARCHAR(20),
+    email VARCHAR(100),
+    tgl_lahir DATE,
+    tgl_daftar DATE
+);
+```
+
+### 2. **Tabel `denda`:**
+
+```sql
+CREATE TABLE denda (
+    id_denda INT AUTO_INCREMENT PRIMARY KEY,
+    nominal INT NOT NULL
+);
+```
+
+### 3. **Tabel `kategori_buku`:**
+
+```sql
+CREATE TABLE kategori_buku (
+    id_kategori INT AUTO_INCREMENT PRIMARY KEY,
+    kategori VARCHAR(100)
+);
+```
+
+### 4. **Tabel `users`:**
+
+```sql
+CREATE TABLE users (
+    id_user INT AUTO_INCREMENT PRIMARY KEY,
+    nama_user VARCHAR(100),
+    password VARCHAR(100)
+);
+```
+
+### 5. **Tabel `peminjaman`:**
+
+```sql
+CREATE TABLE peminjaman (
+    id_pinjam INT AUTO_INCREMENT PRIMARY KEY,
+    lama_pinjam INT,
+    nominal_denda INT,
+    id_anggota INT,
+    id_denda INT,
+    id_user INT,
+    FOREIGN KEY (id_anggota) REFERENCES anggota(id_anggota),
+    FOREIGN KEY (id_denda) REFERENCES denda(id_denda),
+    FOREIGN KEY (id_user) REFERENCES users(id_user)
+);
+```
+
+### 6. **Tabel `buku`:**
+
+```sql
+CREATE TABLE buku (
+    id_buku INT AUTO_INCREMENT PRIMARY KEY,
+    judul VARCHAR(255) NOT NULL,
+    pengarang VARCHAR(100),
+    penerbit VARCHAR(100),
+    tahun INT,
+    isbn VARCHAR(100),
+    tgl_input DATE,
+    jumlah_halaman INT,
+    id_kategori INT,
+    FOREIGN KEY (id_kategori) REFERENCES kategori_buku(id_kategori)
+);
+```
+
+### 7. **Tabel `detail_pinjam`:**
+
+```sql
+CREATE TABLE detail_pinjam (
+    id_pinjam INT,
+    id_buku INT,
+    FOREIGN KEY (id_pinjam) REFERENCES peminjaman(id_pinjam),
+    FOREIGN KEY (id_buku) REFERENCES buku(id_buku)
+);
+```
+
+---
+
+Saya telah menulis ulang semua query sesuai dengan permintaan Anda. Tabel `detail_pinjam` sudah merujuk ke kolom `id_pinjam` pada tabel `peminjaman` dan kolom `id_buku` pada tabel `buku`, seperti yang Anda inginkan.
+
+Jika ada hal lain yang perlu Anda ubah atau jika ada pertanyaan lebih lanjut, beri tahu saya!
