@@ -50,8 +50,8 @@ $hr = mysqli_fetch_assoc($result_hr);
         <?php endif; ?>
         
         <!-- Add Career Button -->
-        <a href="tambah_karir.php" class="btn btn-primary mb-4" id="tambah_lowongan_karir">Tambah Lowongan Karir</a>
-        
+        <a href="tambah_karir.php" class="btn btn-primary mb-4" id="tambah_karir">Tambah Karir</a>
+         
         
         <h3 class="text-center">Daftar Peserta</h3>
         <div class="table-responsive">

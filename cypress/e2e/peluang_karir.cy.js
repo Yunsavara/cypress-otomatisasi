@@ -3,7 +3,7 @@ describe('Test Peluang Karir', () => {
         cy.visit('https://localhost/karir');
         cy.contains('Peluang Karir').click();
         cy.contains('Peluang Karir');
-    });
+    });  
 
     it('Daftar Peluang Karir', () => {
         cy.visit('https://localhost/karir');

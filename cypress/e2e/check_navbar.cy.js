@@ -11,5 +11,5 @@ describe('Test Halaman Navbar', () => {
         cy.contains('a', 'Careers');
         cy.contains('Member of NIRWANA ABADI SENTOSA');
         cy.contains('LOGIN');
-    });
+    }); 
 });

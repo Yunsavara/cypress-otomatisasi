@@ -2,7 +2,7 @@ describe('Test Registrasi', () => {
   it('Kunjungi Halaman Registrasi dan daftar peserta', () => {
     cy.visit('https://localhost/karir/daftar_peserta.php');
     cy.contains('Pendaftaran Peserta');
-
+ 
     // Pendaftaran Peserta
     cy.get('input[name="nama_lengkap"]').type('Peserta Testing');
     cy.get('input[name="email"]').type('peserta@testing.com');

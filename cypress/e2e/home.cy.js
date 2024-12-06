@@ -3,4 +3,4 @@ describe('Redirect ke Medikaprakarsa.co.id', () => {
     cy.visit('https://localhost/karir/');
     cy.contains('a', 'Home').click();
     })
-})
+}) 

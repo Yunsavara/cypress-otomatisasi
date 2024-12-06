@@ -5,9 +5,10 @@ describe('Tambah Lowongan Karir', () => {
         cy.get('input[name="username"]').type('hr');
         cy.get('input[name="password"]').type('hr');
         cy.get('button[type="submit"]').click();
-        cy.contains('Dashboard');
+        cy.contains('Dashboard'); 
 
-        cy.get('#tambah_lowongan_karir').click();
+        cy.contains('Tambah karir').should('be.visible');
+        cy.get('a[href="tambah_karir.php"]').click();
         cy.contains('Tambah Lowongan Karir');
         cy.get('input[name="posisi"]').type('Manager');
         cy.get('textarea[name="deskripsi"]').type('Deskripsi Manager');

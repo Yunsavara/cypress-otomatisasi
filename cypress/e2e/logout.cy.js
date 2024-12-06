@@ -8,7 +8,7 @@ describe('Klik Logout dari Navbar', () => {
         cy.get('button[type="submit"]').click();
         cy.contains('Dashboard');
         cy.get('.dropdown-toggle').click();
-  
+   
         // Klik link Logout
         cy.contains('a', 'Logout').click();
     
